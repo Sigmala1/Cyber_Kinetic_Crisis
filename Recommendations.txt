@@ -1,8 +1,36 @@
+Create a cyber dashboard based on obligations – is something online, have you changed a password. Proof could be a “yes” or a screenshot
+
+•	Obligations in natural language need to be broad enough to cover everything 
+•	Make it simple and describe in obligations what each is
+•	All maintenance has to be actionable
+•	We need to identify all obligations and the date for each obligation to be met
+•	What are the core assets to capture? 
+•	Which obligations are actionable, and which have to be done and the dates they have to be done by
+
+•	Need to filter what the Critical Assets are
+•	Need an agent to identify what asset something is
 
 
 Preventative Maintenance: scheduled routine work to reduce the chance of failure
 Predictive Maintenance: using condition data, sensors or trends to service something before it fails
 Corrective Maintnenance: fixing an issue that was found before it caused full failure
 Reactive Maintenance: repairing only after something breaks
-Condition-based Maintenance: maintenance triggered by actual asset condition, not just time or usage
+Condition-Based Maintenance: maintenance triggered by actual asset condition, not just time or usage
 Routine Maintenance: basic recurring upkeep like cleaning, lubrication, tightening, inspections
+Planned Maintenance: any maintenance organized in advance, often including preventative work and planned repairs
+Unplanned Maintenance: urgent or unexpected work due to breakdowns or sudden defects
+Emergency Maintenance: immediate work needed to address safety, uptime, or damage risk
+Deferred Maintenance: needed work that gets postponed
+Shutdown / Trunaround Maintenance: major maintenance done while a system or factory is intentionally taken offline
+Reliability-Centered Maintenance: choosing the right maintnenance strategy based on consequence and likelihood of failure
+Prescriptive Maintenance: analytics not only predict failure, but recommned the best action to take
+Autonomous Maintenance: baisc maintenance done by operators, not specialized technicians
+
+A simple way to think about it:
+
+Before Failure: preventative, predictive, condition-based
+After Failure: corrective, reactive, emergency
+How it's organized: planned, unplanned, deferred, shutdown
+How it's prioritized: reliability-centered, risk-based
+
+In facilities and critical assets, the main buckets people usually use are preventative, predictive, corrective, reactive, and emergency. 
