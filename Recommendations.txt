@@ -1,0 +1,8 @@
+
+
+Preventative Maintenance: scheduled routine work to reduce the chance of failure
+Predictive Maintenance: using condition data, sensors or trends to service something before it fails
+Corrective Maintnenance: fixing an issue that was found before it caused full failure
+Reactive Maintenance: repairing only after something breaks
+Condition-based Maintenance: maintenance triggered by actual asset condition, not just time or usage
+Routine Maintenance: basic recurring upkeep like cleaning, lubrication, tightening, inspections
