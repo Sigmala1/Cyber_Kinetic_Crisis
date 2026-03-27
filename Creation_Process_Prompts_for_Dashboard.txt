@@ -1,0 +1,7 @@
+I would like to make a dashboard that allows one to evaluate the status of devices within a building for cyber purposes.
+-> I have created an implementation plan for a web-based dashboard outlining the proposed architecture and design approach. Please review the plan in the artifacts and let me know if you approve this approach or if you have any answers to the open questions!
+I would like to add to this plan. Please start by having a means of determining whether a device is "on" or "off".
+-> I have updated the implementation plan to specifically call out adding an operational state representing whether a device is "On" or "Off". The components will clearly display indicator lights (or labels) for this alongside the separate cybersecurity health metrics.
+
+Let me know if there's anything else you'd like to add or adjust, or if you approve the plan and are ready for me to begin setting up the dashboard!
+
