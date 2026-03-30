@@ -1,5 +1,5 @@
 import React from 'react';
-import { Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users, ShieldAlert, ShieldCheck, Activity, Wrench, Link2, MapPin } from 'lucide-react';
+import { Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users, ShieldAlert, ShieldCheck, Activity, Wrench, Link2, MapPin, Cable } from 'lucide-react';
 
 export default function DeviceGrid({ devices }) {
   if (devices.length === 0) return (
@@ -74,6 +74,14 @@ function DeviceCard({ device }) {
           <div className="flex" style={{ gap: '4px', flexWrap: 'wrap' }}>
             {device.dependencies.length ? device.dependencies.map(dep => (
               <span key={dep} className="badge neutral" style={{ fontSize: '0.7rem' }}>{dep}</span>
+            )) : <span className="text-muted">None</span>}
+          </div>
+        </div>
+        <div className="flex flex-col mt-2 pt-2" style={{ borderTop: '1px solid var(--glass-border)' }}>
+          <span className="text-muted flex items-center gap-2 mb-1"><Cable size={14} /> Open Ports:</span>
+          <div className="flex" style={{ gap: '4px', flexWrap: 'wrap' }}>
+            {device.openPorts && device.openPorts.length ? device.openPorts.map(port => (
+              <span key={port} className="badge warning" style={{ fontSize: '0.7rem' }}>{port}</span>
             )) : <span className="text-muted">None</span>}
           </div>
         </div>
