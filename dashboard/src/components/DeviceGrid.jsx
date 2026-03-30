@@ -1,5 +1,5 @@
 import React from 'react';
-import { Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users, ShieldAlert, ShieldCheck, Activity, Wrench, Link2, MapPin, Cable, Globe } from 'lucide-react';
+import { Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users, ShieldAlert, ShieldCheck, Activity, Wrench, Link2, MapPin, Cable, Globe, Layers } from 'lucide-react';
 
 export default function DeviceGrid({ devices }) {
   if (devices.length === 0) return (
@@ -60,6 +60,10 @@ function DeviceCard({ device }) {
       </div>
 
       <div className="flex-col gap-2" style={{ fontSize: '0.85rem', padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+        <div className="flex justify-between">
+          <span className="text-muted flex items-center gap-2"><Layers size={14} /> System Class:</span>
+          <span style={{ fontWeight: 500, color: 'var(--primary)' }}>{device.systemCategory}</span>
+        </div>
         <div className="flex justify-between">
           <span className="text-muted flex items-center gap-2"><Wrench size={14} /> Last Maintained:</span>
           <span>{device.lastMaintainedDate}</span>
