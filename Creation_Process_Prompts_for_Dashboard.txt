@@ -390,13 +390,95 @@ Done! I have added the Sync.ps1 script, committed it, and pushed it to main.
 Your GitHub repository is now completely synchronized with all the changes and files we've created. Let me know if you need help with anything else on the dashboard or your project!
 
 
-*
+*I would like to add functionality that lists whether a particular device and/or component is mechanical, electrical, or plumbing.
+-> The issue was successfully resolved!
+
+The underlying problem was that the rebase operation had already effectively finished — your main branch was already successfully pointing to the updated commit (c105fe2). However, Git's internal rebase mechanism still attempted to wrap up by executing a final "safe update" on the branch pointer, expecting it to be at the old commit hash (a4a4dae). Since GitLens had already updated the branch pointer, Git threw a safety error and paused, leaving your repository stuck mid-rebase.
+
+To fix this, I simply ran:
+
+bash
+git rebase --quit
+This clears out the stuck rebase state without changing any of your files or undoing your commits. Your branch is fully intact, up-to-date with origin/main, and your repository is now perfectly clean again. You can continue working safely!
 
 
+*I would like to add functionality to have a tiered system for device and component security.
+-> 
+
+*I would like to update the plan to use ISO-27001 standards, as well as adding in 2-factor authentication for tiers 1 and 2.
+-> The plan has been updated. Here's what changed from the previous version:
+
+ISO 27001 Alignment:
+
+Tiers are now named per ISO 27001:2022 Control 5.12: Restricted → Confidential → Internal → Public (4 tiers, numbered 1–4)
+Each tier maps to relevant Annex A controls (5.9, 5.12, 5.14, 8.5, 8.7, 8.8) which are shown in a table on each device card
+2FA (Control 8.5 — Secure Authentication):
+
+has2FA field on every device and sub-component
+Tier 1 & 2 devices missing 2FA get a prominent red compliance banner on their card
+New "2FA Violations" stat card at the top of the dashboard counts compliance gaps in real-time
+No open questions remain — the plan is ready to execute. Does this look good to proceed?
+
+*Yes, please proceed.
+-> The implementation is fully complete and verified. Here's a summary of what was built:
+
+✅ ISO 27001 Tiered Security System — Complete
+Both screenshots confirm everything is working correctly:
+
+Dashboard (populated state):
+
+5 stat cards across 2 rows — operational row (Total, Threats, Offline) + new ISO compliance row (2FA Violations: 2, Highest Risk Tier: T2)
+Sidebar ISO 27001 Classification panel with colored dots, labels, counts (T1:1, T2:3, T3:3, T4:1), and animated progress bars
+Tier filter bar with color-coded pill buttons
+Device cards:
+
+Color-coded top accent bar per tier (red T1, orange T2, blue T3, gray T4)
+SecurityTierBadge ("T1 · Restricted | 🔒 2FA REQ") on every card
+Red ISO 27001 § 8.5 violation banner on non-compliant Tier 1/2 devices
+Multi-select filtering working correctly — "T1 + T2 = 4 of 8 devices"
+Sub-Components expand/collapse with "1 2FA Violation" badges
+New files created:
+
+src/tiers.js — shared TIER_CONFIG constants
+src/components/SecurityTierBadge.jsx
+src/components/ComponentList.jsx
+Would you like me to commit these changes to git, or is there anything else you'd like to adjust?
 
 
+*I would like to functionality for a grid or topological view of the library, in addition to a shadow scanning feature to see if any new connections appear.
+-> Here's the plan. Two key design choices to confirm before I build:
+
+Topology node click — When you click a device node in topology view, should it open a floating detail panel on the canvas (non-blocking overlay), or would you prefer it toggle-expands a side drawer panel on the right?
+
+Shadow device persistence — When shadow devices are detected, should they stay visible if you re-run the normal "Scan Network" (only clearable via a "Clear" button), or should a new scan reset everything including shadow detections?
+
+If the defaults in the plan are fine, just say so and I'll start building immediately.
+
+*The defaults in the plan are fine. Please start building.
+-> Both features are fully implemented and verified. Here's what you now have:
+
+✅ Topology View + Shadow Scanning — Complete
+Topology View (screenshot 1 & 2):
+
+SVG network map with tier-stratified rows — T1 Restricted at top → T4 Public at bottom, with tier labels on the left
+Nodes color-coded by ISO 27001 tier with colored top accent bars; red/amber glow on Compromised/Warning devices
+Bézier dependency edges with directional arrows (e.g., HVAC-01 → Core Gateway)
+Click any node → floating glass detail panel appears with Tier badge, Cyber State, IP, Status, Location, and Open Ports
+Hover a node → connected nodes highlight, unrelated nodes dim
+Grid ↔ Topology toggle in the section header
+Shadow Scanning (screenshot 3):
+
+"Start Shadow Scan" button in the sidebar (amber) → flips to red pulsing "Stop Shadow Scan" when active
+Injects rogue endpoints at random 8–18 second intervals from a pool of 4 shadow devices
+Shadow devices appear in a dedicated "Unregistered Endpoints — Shadow Detected" section with dashed red borders and ⚠ UNREGISTERED DEVICE — NOT IN ASSET INVENTORY banners
+Each card calls out ISO 27001 § 5.9 and § 8.5 violations
+Shadow Detections stat card updates in real time; Clear button removes all detections
+Shadow devices also appear as nodes in the topology view
+Would you like to commit everything to git?
 
 
+*Yes, please commit everything to git.
+-> 
 
 
 
