@@ -1,5 +1,5 @@
 import React from 'react';
-import { Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users, ShieldAlert, ShieldCheck, Activity, Wrench, Link2 } from 'lucide-react';
+import { Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users, ShieldAlert, ShieldCheck, Activity, Wrench, Link2, MapPin } from 'lucide-react';
 
 export default function DeviceGrid({ devices }) {
   if (devices.length === 0) return (
@@ -35,7 +35,8 @@ function DeviceCard({ device }) {
       <div className="flex justify-between items-center" style={{ marginBottom: '16px' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '1.2rem', color: isDanger ? 'var(--danger)' : 'var(--text-primary)' }}>{device.name}</h3>
-          <span className="text-muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase' }}>{device.type} | ID: {device.id}</span>
+          <span className="text-muted" style={{ fontSize: '0.8rem', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>{device.type} | ID: {device.id}</span>
+          <span className="text-muted flex items-center gap-1" style={{ fontSize: '0.75rem' }}><MapPin size={12}/> {device.location.building}, {device.location.room} ({device.location.city}, {device.location.state}, {device.location.country})</span>
         </div>
         {isDanger ? <ShieldAlert size={24} className="text-danger" /> : <ShieldCheck size={24} className="text-success" />}
       </div>
