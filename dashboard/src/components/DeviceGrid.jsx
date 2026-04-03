@@ -16,7 +16,7 @@ const TIER_FILTERS = [
   { label: 'T4 · Public',        value: 4    },
 ];
 
-export default function DeviceGrid({ devices, shadowDevices = [] }) {
+export default function DeviceGrid({ devices }) {
   const [selectedTiers, setSelectedTiers] = useState([]);
 
   const toggleTier = (tier) => {
@@ -30,9 +30,9 @@ export default function DeviceGrid({ devices, shadowDevices = [] }) {
     ? devices
     : devices.filter(d => selectedTiers.includes(d.securityTier));
 
-  const hasAny = filteredDevices.length > 0 || shadowDevices.length > 0;
+  const hasAny = filteredDevices.length > 0;
 
-  if (devices.length === 0 && shadowDevices.length === 0) return (
+  if (devices.length === 0) return (
     <div className="flex justify-center items-center" style={{ height: '200px', color: 'var(--text-secondary)' }}>
       No devices discovered. Initiating scan…
     </div>
@@ -82,30 +82,6 @@ export default function DeviceGrid({ devices, shadowDevices = [] }) {
         {filteredDevices.map(dev => <DeviceCard key={dev.id} device={dev} />)}
       </div>
 
-      {/* ── Shadow / Unregistered Devices ── */}
-      {shadowDevices.length > 0 && (
-        <div style={{ marginTop: '36px' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '10px',
-            marginBottom: '16px', paddingBottom: '12px',
-            borderBottom: '1px solid rgba(248,81,73,0.25)',
-          }}>
-            <Ghost size={18} style={{ color: '#ff7b72' }} />
-            <h3 style={{ margin: 0, fontSize: '1rem', color: '#ff7b72' }}>
-              Unregistered Endpoints — Shadow Detected
-            </h3>
-            <span style={{
-              fontSize: '0.7rem', fontWeight: 700, padding: '2px 10px', borderRadius: '12px',
-              background: 'rgba(248,81,73,0.15)', color: '#ff7b72', border: '1px solid rgba(248,81,73,0.3)',
-            }}>
-              ISO 27001 § 5.9 Violation
-            </span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(370px, 1fr))', gap: '20px' }}>
-            {shadowDevices.map(dev => <ShadowCard key={dev.id} device={dev} />)}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -220,62 +196,6 @@ function DeviceCard({ device }) {
   );
 }
 
-/* ─────────────────────────────────────────── */
-/* Shadow / Rogue Device Card                  */
-/* ─────────────────────────────────────────── */
-function ShadowCard({ device }) {
-  return (
-    <div className="glass-panel flex-col shadow-card animate-alert" style={{ padding: 0, overflow: 'hidden' }}>
-      {/* Top danger stripe */}
-      <div style={{
-        height: '4px', width: '100%',
-        background: 'repeating-linear-gradient(90deg, #f85149 0px, #f85149 12px, #ff6a00 12px, #ff6a00 24px)',
-        flexShrink: 0,
-      }} />
-
-      {/* Alert banner */}
-      <div style={{
-        background: 'rgba(248,81,73,0.12)', borderBottom: '1px solid rgba(248,81,73,0.3)',
-        padding: '7px 20px', display: 'flex', alignItems: 'center', gap: '8px',
-      }}>
-        <Ghost size={14} style={{ color: '#ff7b72' }} />
-        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#ff7b72', letterSpacing: '0.4px' }}>
-          ⚠ UNREGISTERED DEVICE — NOT IN ASSET INVENTORY
-        </span>
-      </div>
-
-      <div style={{ padding: '20px' }}>
-        <div className="flex justify-between items-center" style={{ marginBottom: '14px' }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--danger)' }}>{device.name}</h3>
-            <span className="text-muted" style={{ fontSize: '0.78rem', textTransform: 'uppercase' }}>
-              {device.type} · {device.id}
-            </span>
-          </div>
-          <ShieldAlert size={22} style={{ color: 'var(--danger)' }} />
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.83rem', padding: '12px', background: 'rgba(248,81,73,0.06)', borderRadius: '8px', border: '1px dashed rgba(248,81,73,0.25)' }}>
-          {[
-            ['IP Address', device.ipAddress],
-            ['Cyber State', device.cyberState],
-            ['Open Ports', device.openPorts?.length ? device.openPorts.join(', ') : 'Unknown'],
-            ['Known Deps', device.dependencies?.length ? device.dependencies.join(', ') : 'None'],
-          ].map(([label, value]) => (
-            <div key={label} className="flex justify-between">
-              <span className="text-muted">{label}:</span>
-              <span style={{ fontWeight: 600, color: label === 'Cyber State' ? 'var(--danger)' : 'var(--text-primary)' }}>{value}</span>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ marginTop: '12px', fontSize: '0.7rem', color: '#d29922', lineHeight: 1.5 }}>
-          ISO 27001 Violations: § 5.9 (Asset Inventory) · § 8.5 (Authentication)
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function StatusBadge({ icon, label, type }) {
   return (

@@ -120,59 +120,12 @@ const MOCK_DEVICES = [
   },
 ];
 
-/* ─── Shadow / rogue device pool (detected by shadow scan) ─── */
-const SHADOW_DEVICE_POOL = [
-  {
-    id: 'SHADOW-001', name: 'Unknown Endpoint', type: 'Unknown',
-    isShadow: true, securityTier: 2, has2FA: false,
-    isOn: true, isOnline: true, hasPassword: false, condition: 'Unknown',
-    cyberState: 'Compromised', lastMaintainedDate: 'Unknown',
-    authorizedRoles: [], activeUsers: 0, dependencies: ['NET-GW-01'],
-    location: { city: '??', state: '??', country: '??', building: '??', room: 'Unknown' },
-    openPorts: [4444, 8080, 22], ipAddress: '192.168.99.14/24', systemCategory: 'Unknown',
-    components: [],
-  },
-  {
-    id: 'SHADOW-002', name: 'Rogue BLE Beacon', type: 'IoT Unknown',
-    isShadow: true, securityTier: 3, has2FA: false,
-    isOn: true, isOnline: true, hasPassword: false, condition: 'Unknown',
-    cyberState: 'Compromised', lastMaintainedDate: 'Unknown',
-    authorizedRoles: [], activeUsers: 0, dependencies: [],
-    location: { city: '??', state: '??', country: '??', building: 'HQ', room: 'Unknown Floor' },
-    openPorts: [2222, 6666], ipAddress: '192.168.99.77/24', systemCategory: 'Unknown',
-    components: [],
-  },
-  {
-    id: 'SHADOW-003', name: 'Unauthorized Hub', type: 'Network',
-    isShadow: true, securityTier: 1, has2FA: false,
-    isOn: true, isOnline: true, hasPassword: false, condition: 'Unknown',
-    cyberState: 'Compromised', lastMaintainedDate: 'Unknown',
-    authorizedRoles: [], activeUsers: 0, dependencies: ['NET-GW-01'],
-    location: { city: '??', state: '??', country: '??', building: 'HQ', room: 'Server Room 1' },
-    openPorts: [80, 443, 8888], ipAddress: '192.168.99.101/24', systemCategory: 'Unknown',
-    components: [],
-  },
-  {
-    id: 'SHADOW-004', name: 'Phantom Controller', type: 'Unknown',
-    isShadow: true, securityTier: 2, has2FA: false,
-    isOn: true, isOnline: true, hasPassword: false, condition: 'Unknown',
-    cyberState: 'Compromised', lastMaintainedDate: 'Unknown',
-    authorizedRoles: [], activeUsers: 0, dependencies: ['HVAC-01'],
-    location: { city: '??', state: '??', country: '??', building: 'HQ', room: 'Utility Area' },
-    openPorts: [1337, 9999], ipAddress: '192.168.99.203/24', systemCategory: 'Unknown',
-    components: [],
-  },
-];
 
 /* ─── App ───────────────────────────────────────────────────── */
 function App() {
   const [devices,          setDevices]          = useState([]);
   const [isScanning,       setIsScanning]        = useState(false);
-  const [shadowDevices,    setShadowDevices]      = useState([]);
-  const [isShadowScanning, setIsShadowScanning]   = useState(false);
   const [viewMode,         setViewMode]           = useState('grid'); // 'grid' | 'topology'
-  const shadowTimerRef = useRef(null);
-  const shadowIndexRef = useRef(0);
 
   /* Normal network scan */
   const startScan = () => {
@@ -186,47 +139,10 @@ function App() {
     });
   };
 
-  /* Shadow scan — injects rogue devices at random intervals */
-  const startShadowScan = () => {
-    setIsShadowScanning(true);
-    shadowIndexRef.current = 0;
-
-    const scheduleNext = () => {
-      const delay = 8000 + Math.random() * 10000; // 8–18 s
-      shadowTimerRef.current = setTimeout(() => {
-        const pool = SHADOW_DEVICE_POOL;
-        if (shadowIndexRef.current >= pool.length) {
-          setIsShadowScanning(false);
-          return;
-        }
-        const dev = pool[shadowIndexRef.current++];
-        setShadowDevices(prev => prev.find(d => d.id === dev.id) ? prev : [...prev, dev]);
-        scheduleNext();
-      }, delay);
-    };
-
-    scheduleNext();
-  };
-
-  const stopShadowScan = () => {
-    setIsShadowScanning(false);
-    clearTimeout(shadowTimerRef.current);
-    shadowTimerRef.current = null;
-  };
-
-  const clearShadow = () => {
-    stopShadowScan();
-    setShadowDevices([]);
-    shadowIndexRef.current = 0;
-  };
-
-  /* Combined device list for topology / stats */
-  const allDevices = [...devices, ...shadowDevices];
 
   /* ── Derived stats ── */
   const totalDevices    = devices.length;
-  const shadowCount     = shadowDevices.length;
-  const activeThreats   = allDevices.filter(d => d.cyberState === 'Compromised' || d.cyberState === 'Warning').length;
+  const activeThreats   = devices.filter(d => d.cyberState === 'Compromised' || d.cyberState === 'Warning').length;
   const offlineDevices  = devices.filter(d => !d.isOnline).length;
   const twoFAViolations = devices.filter(d => TIER_CONFIG[d.securityTier]?.requires2FA && !d.has2FA).length;
 
@@ -246,11 +162,6 @@ function App() {
         onScan={startScan}
         totalFound={totalDevices}
         devices={devices}
-        isShadowScanning={isShadowScanning}
-        shadowCount={shadowCount}
-        onStartShadowScan={startShadowScan}
-        onStopShadowScan={stopShadowScan}
-        onClearShadow={clearShadow}
       />
 
       <main style={{
@@ -289,13 +200,6 @@ function App() {
             subtitle={riskTierSubtitle}
             type={highestRiskTier === 1 ? 'danger' : highestRiskTier === 2 ? 'warning' : 'success'}
           />
-          <StatCard
-            title="Shadow Detections"
-            value={shadowCount}
-            icon={<Ghost size={20} />}
-            subtitle={shadowCount > 0 ? 'Unregistered devices on network' : 'No rogue activity detected'}
-            type={shadowCount > 0 ? 'danger' : 'success'}
-          />
         </div>
 
         {/* ── Infrastructure Section ── */}
@@ -323,8 +227,8 @@ function App() {
           </div>
 
           {viewMode === 'grid'
-            ? <DeviceGrid devices={devices} shadowDevices={shadowDevices} />
-            : <TopologyView devices={allDevices} />
+            ? <DeviceGrid devices={devices} />
+            : <TopologyView devices={devices} />
           }
         </section>
       </main>

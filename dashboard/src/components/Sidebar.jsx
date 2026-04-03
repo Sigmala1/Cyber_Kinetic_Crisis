@@ -4,8 +4,6 @@ import { TIER_CONFIG } from '../tiers';
 
 export default function Sidebar({
   isScanning, onScan, totalFound, devices = [],
-  isShadowScanning, shadowCount = 0,
-  onStartShadowScan, onStopShadowScan, onClearShadow,
 }) {
   const tierCounts = Object.keys(TIER_CONFIG).reduce((acc, tier) => {
     acc[tier] = devices.filter(d => d.securityTier === Number(tier)).length;
@@ -36,48 +34,6 @@ export default function Sidebar({
         <Search size={18} />
         {isScanning ? 'Scanning Network…' : 'Scan Network'}
       </button>
-
-      {/* ── Shadow Scan ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <button
-          id="shadow-scan-btn"
-          className={`w-full justify-center shadow-scan-btn ${isShadowScanning ? 'active' : ''}`}
-          onClick={isShadowScanning ? onStopShadowScan : onStartShadowScan}
-          disabled={false}
-        >
-          {isShadowScanning
-            ? <><StopCircle size={16} /> Stop Shadow Scan</>
-            : <><Ghost size={16} /> Start Shadow Scan</>
-          }
-        </button>
-
-        {shadowCount > 0 && (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '6px 10px', borderRadius: '8px',
-            background: 'rgba(248, 81, 73, 0.1)', border: '1px solid rgba(248,81,73,0.25)',
-          }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ff7b72', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Ghost size={12} /> {shadowCount} Shadow{shadowCount > 1 ? 's' : ''} Detected
-            </span>
-            <button
-              id="clear-shadow-btn"
-              onClick={onClearShadow}
-              title="Clear all shadow detections"
-              style={{ background: 'none', border: 'none', padding: '2px 4px', color: 'rgba(248,81,73,0.7)', cursor: 'pointer' }}
-            >
-              <Trash2 size={13} />
-            </button>
-          </div>
-        )}
-
-        {isShadowScanning && (
-          <p style={{ fontSize: '0.68rem', color: '#d29922', margin: '2px 0 0', lineHeight: 1.4, display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
-            <span style={{ fontSize: '10px', marginTop: '1px' }}>⚠</span>
-            Monitoring for unregistered connections…
-          </p>
-        )}
-      </div>
 
       {/* ── Network Status ── */}
       <div style={{ marginTop: '20px' }}>
