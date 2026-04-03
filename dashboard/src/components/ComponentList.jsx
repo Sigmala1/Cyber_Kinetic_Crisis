@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, ShieldCheck, ShieldAlert, ShieldOff } from 'lucide-react';
-import SecurityTierBadge from './SecurityTierBadge';
-import { TIER_CONFIG } from '../tiers';
+import { ChevronDown, ChevronRight, CheckCircle2, XCircle, Activity, ShieldAlert, ShieldCheck } from 'lucide-react';
 
 /**
- * Collapsible sub-component inventory for a device card.
- * Each component shows its ISO 27001 tier, cyber state, and 2FA compliance.
+ * Collapsible sub-component audit for a device card.
+ * Each component shows its fulfillment of basic health obligations (Condition & Cyber State).
  */
 export default function ComponentList({ components }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!components || components.length === 0) return null;
 
-  const violationCount = components.filter(c => {
-    const conf = TIER_CONFIG[c.securityTier];
-    return conf && conf.requires2FA && !c.has2FA;
-  }).length;
+  // Flatten component obligations to count unmet status
+  const allCompObligations = components.flatMap(c => c.obligations || []);
+  const unmetCount = allCompObligations.filter(o => o.status === 'unmet').length;
 
   return (
     <div style={{
@@ -23,7 +20,7 @@ export default function ComponentList({ components }) {
       borderTop: '1px solid var(--glass-border)',
       paddingTop: '12px',
     }}>
-      {/* Toggle button */}
+      {/* ── Toggle Header ── */}
       <button
         onClick={() => setExpanded(e => !e)}
         style={{
@@ -35,72 +32,78 @@ export default function ComponentList({ components }) {
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-          Sub-Components ({components.length})
+          Component Accountability ({components.length})
         </span>
-        {violationCount > 0 && (
+        {unmetCount > 0 && (
           <span style={{
-            fontSize: '0.68rem', fontWeight: 700,
-            color: '#ff7b72',
-            background: 'rgba(248,81,73,0.12)',
-            border: '1px solid rgba(255,123,114,0.3)',
-            padding: '2px 8px', borderRadius: '12px',
+            fontSize: '0.65rem', fontWeight: 700,
+            color: '#ffab70',
+            background: 'rgba(255,171,112,0.1)',
+            border: '1px solid rgba(255,171,112,0.3)',
+            padding: '1px 8px', borderRadius: '12px',
             display: 'flex', alignItems: 'center', gap: '4px',
           }}>
-            <ShieldOff size={10} /> {violationCount} 2FA {violationCount === 1 ? 'Violation' : 'Violations'}
+            <Activity size={10} /> {unmetCount} Unmet {unmetCount === 1 ? 'Duty' : 'Duties'}
           </span>
         )}
       </button>
 
-      {/* Expanded component rows */}
+      {/* ── Expanded Audit Rows ── */}
       {expanded && (
         <div
           className="component-list-expand"
-          style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}
+          style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}
         >
           {components.map((comp, i) => {
-            const tierConf = TIER_CONFIG[comp.securityTier] || TIER_CONFIG[4];
-            const hasViolation = tierConf.requires2FA && !comp.has2FA;
-            const isDanger = comp.cyberState === 'Compromised';
-            const isWarning = comp.cyberState === 'Warning';
+            const conditionOb = comp.obligations?.find(o => o.id === 'condition');
+            const stateOb     = comp.obligations?.find(o => o.id === 'cyber-state');
+            
+            const isAllMet = !comp.obligations?.some(o => o.status === 'unmet');
 
             return (
               <div
                 key={i}
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '8px 12px', borderRadius: '8px', gap: '8px', flexWrap: 'wrap',
-                  background: hasViolation
-                    ? 'rgba(248, 81, 73, 0.07)'
-                    : 'rgba(0, 0, 0, 0.2)',
-                  border: hasViolation
-                    ? '1px solid rgba(248, 81, 73, 0.22)'
-                    : '1px solid transparent',
-                  transition: 'background 0.2s ease',
+                  display: 'flex', flexDirection: 'column',
+                  padding: '10px', borderRadius: '8px', gap: '4px',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  border: isAllMet ? '1px solid transparent' : '1px solid rgba(255,171,112,0.2)',
                 }}
               >
-                {/* Component name */}
-                <span style={{ fontSize: '0.8rem', fontWeight: 500, flex: 1, minWidth: '100px' }}>
-                  {comp.name}
-                </span>
-
-                {/* Right side: tier badge + cyber state */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                  <SecurityTierBadge tier={comp.securityTier} has2FA={comp.has2FA} mini />
-
-                  {/* Cyber state indicator */}
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '3px',
-                    fontSize: '0.68rem', fontWeight: 700,
-                    color: isDanger ? 'var(--danger)' : isWarning ? 'var(--warning)' : '#3fb950',
-                  }}>
-                    {isDanger
-                      ? <ShieldAlert size={12} />
-                      : isWarning
-                      ? <ShieldOff size={12} />
-                      : <ShieldCheck size={12} />
-                    }
-                    {comp.cyberState}
+                <div className="flex justify-between items-center" style={{ marginBottom: '4px' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {comp.name}
                   </span>
+                  {isAllMet 
+                    ? <CheckCircle2 size={12} style={{ color: '#3fb950' }} /> 
+                    : <ShieldAlert size={12} style={{ color: '#ffab70' }} />
+                  }
+                </div>
+
+                <div className="flex gap-4">
+                  {/* Condition Mini-Audit */}
+                  <div className="flex items-center gap-2" style={{ fontSize: '0.68rem' }}>
+                    {conditionOb?.status === 'met' 
+                      ? <ShieldCheck size={11} style={{ color: '#3fb950' }} /> 
+                      : <XCircle size={11} style={{ color: '#ffab70' }} />
+                    }
+                    <span className="text-muted">Health:</span>
+                    <span style={{ color: conditionOb?.status === 'met' ? 'var(--text-primary)' : '#ffab70' }}>
+                      {comp.condition}
+                    </span>
+                  </div>
+
+                  {/* Cyber State Mini-Audit */}
+                  <div className="flex items-center gap-2" style={{ fontSize: '0.68rem' }}>
+                    {stateOb?.status === 'met' 
+                      ? <ShieldCheck size={11} style={{ color: '#3fb950' }} /> 
+                      : <XCircle size={11} style={{ color: '#ffab70' }} />
+                    }
+                    <span className="text-muted">Telemetry:</span>
+                    <span style={{ color: stateOb?.status === 'met' ? 'var(--text-primary)' : '#ffab70' }}>
+                      {comp.cyberState}
+                    </span>
+                  </div>
                 </div>
               </div>
             );

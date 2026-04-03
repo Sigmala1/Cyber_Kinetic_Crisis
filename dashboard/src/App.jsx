@@ -127,40 +127,104 @@ function App() {
   const [isScanning,       setIsScanning]        = useState(false);
   const [viewMode,         setViewMode]           = useState('grid'); // 'grid' | 'topology'
 
-  /* Normal network scan */
+  /* ─── Obligation Engine ─── */
+  const generateObligations = (node, isComponent = false) => {
+    const obligations = [];
+    
+    // 1. Condition Obligation (Devices & Components)
+    obligations.push({
+      id: 'condition',
+      label: 'Optimal Health',
+      description: 'Physical and operational condition must be "Optimal"',
+      status: node.condition === 'Optimal' ? 'met' : 'unmet',
+      criticality: 'medium'
+    });
+
+    // 2. Cyber State Obligation (Devices & Components)
+    obligations.push({
+      id: 'cyber-state',
+      label: 'Secure State',
+      description: 'Cyber telemetry must report "Normal" state',
+      status: node.cyberState === 'Normal' ? 'met' : 'unmet',
+      criticality: 'high'
+    });
+
+    if (!isComponent) {
+      // 3. 2FA Obligation (Devices only, Tiers 0, 1, 2)
+      if ([0, 1, 2].includes(node.securityTier)) {
+        obligations.push({
+          id: 'auth-2fa',
+          label: 'MFA Enforcement',
+          description: 'Tier 0-2 assets require Multi-Factor Authentication',
+          status: node.has2FA ? 'met' : 'unmet',
+          criticality: 'high'
+        });
+      }
+
+      // 4. Connectivity Obligation (Devices only)
+      obligations.push({
+        id: 'connectivity',
+        label: 'Network Presence',
+        description: 'Asset must maintain priority connection',
+        status: node.isOnline ? 'met' : 'unmet',
+        criticality: 'medium'
+      });
+
+      // 5. Power Obligation (Devices only)
+      obligations.push({
+        id: 'power',
+        label: 'Power Stability',
+        description: 'Asset must be powered on and stable',
+        status: node.isOn ? 'met' : 'unmet',
+        criticality: 'low'
+      });
+    }
+
+    return obligations;
+  };
+
+  /* Normal network scan — enriched with obligations */
   const startScan = () => {
     setIsScanning(true);
     setDevices([]);
     MOCK_DEVICES.forEach((device, index) => {
       setTimeout(() => {
-        setDevices(prev => [...prev, device]);
+        const enrichedDevice = {
+          ...device,
+          obligations: generateObligations(device),
+          components: device.components.map(c => ({
+            ...c,
+            obligations: generateObligations(c, true)
+          }))
+        };
+        setDevices(prev => [...prev, enrichedDevice]);
         if (index === MOCK_DEVICES.length - 1) setIsScanning(false);
       }, 800 * (index + 1));
     });
   };
 
 
-  /* ── Derived stats ── */
-  const totalDevices    = devices.length;
-  const activeThreats   = devices.filter(d => d.cyberState === 'Compromised' || d.cyberState === 'Warning').length;
-  const offlineDevices  = devices.filter(d => !d.isOnline).length;
-  const twoFAViolations = devices.filter(d => TIER_CONFIG[d.securityTier]?.requires2FA && !d.has2FA).length;
+  /* ── Derived compliance stats ── */
+  const totalNodes        = devices.length;
+  const allObligations    = devices.flatMap(d => [
+    ...d.obligations,
+    ...d.components.flatMap(c => c.obligations)
+  ]);
+  const totalObligations  = allObligations.length;
+  const metObligations    = allObligations.filter(o => o.status === 'met').length;
+  const fulfillmentRate   = totalObligations > 0 ? Math.round((metObligations / totalObligations) * 100) : 0;
+  
+  const criticalFailures  = allObligations.filter(o => o.status === 'unmet' && o.criticality === 'high').length;
+  const warningFailures   = allObligations.filter(o => o.status === 'unmet' && o.criticality === 'medium').length;
 
-  const threateningDevices = devices.filter(d => d.cyberState === 'Compromised' || d.cyberState === 'Warning');
-  const highestRiskTier    = threateningDevices.length > 0
-    ? Math.min(...threateningDevices.map(d => d.securityTier))
-    : null;
-  const riskTierLabel    = highestRiskTier != null ? TIER_CONFIG[highestRiskTier].shortLabel : '—';
-  const riskTierSubtitle = highestRiskTier != null
-    ? `${TIER_CONFIG[highestRiskTier].label} — Active Threat Detected`
-    : 'No active threats detected';
+  const fulfillmentType   = fulfillmentRate > 90 ? 'success' : fulfillmentRate > 70 ? 'warning' : 'danger';
 
   return (
     <div className="flex w-full">
       <Sidebar
         isScanning={isScanning}
         onScan={startScan}
-        totalFound={totalDevices}
+        totalFound={totalNodes}
         devices={devices}
       />
 
@@ -169,36 +233,35 @@ function App() {
         background: 'radial-gradient(circle at 50% 0%, #1a2234 0%, var(--bg-color) 40%)',
       }}>
         <header style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Security Operations Overview</h1>
+          <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Strategic Obligation Audit</h1>
           <p className="text-muted" style={{ margin: 0 }}>
-            Real-time telemetry and ISO 27001-aligned cyber-health metrics for connected infrastructure.
+            Real-time fulfillment tracking of ISO 27001-aligned obligations and duty of care requirements.
           </p>
         </header>
 
-        {/* ── Row 1: Operational stats ── */}
+        {/* ── Row 1: Compliance stats ── */}
         <div className="flex gap-4" style={{ marginBottom: '16px' }}>
-          <StatCard title="Total Connected" value={totalDevices}  icon={<Target size={20} />}      subtitle="Network Nodes Discovered" />
-          <StatCard title="Active Threats"  value={activeThreats} icon={<ServerCrash size={20} />} subtitle="Alerts Requiring Triage"
-            type={activeThreats > 0 ? 'danger' : 'success'} />
-          <StatCard title="Offline Modules" value={offlineDevices} icon={<WifiOff size={20} />}    subtitle="Awaiting Connection"
-            type={offlineDevices > 0 ? 'warning' : 'success'} />
+          <StatCard title="Scope of Obligation" value={totalNodes} icon={<Target size={20} />} subtitle="Tracked Infrastructure Nodes" />
+          <StatCard title="Fulfillment Rate" value={`${fulfillmentRate}%`} icon={<ShieldOff size={20} />} subtitle="Overall Duty Fulfillment"
+            type={fulfillmentType} />
+          <StatCard title="Critical Failures" value={criticalFailures} icon={<AlertOctagon size={20} />} subtitle="High-Risk Unmet Obligations"
+            type={criticalFailures > 0 ? 'danger' : 'success'} />
         </div>
 
-        {/* ── Row 2: ISO 27001 + shadow stats ── */}
+        {/* ── Row 2: Secondary stats ── */}
         <div className="flex gap-4" style={{ marginBottom: '32px' }}>
           <StatCard
-            title="2FA Violations"
-            value={twoFAViolations}
-            icon={<ShieldOff size={20} />}
-            subtitle="ISO 27001 § 8.5 — Tiers 1 & 2 Non-Compliant"
-            type={twoFAViolations > 0 ? 'danger' : 'success'}
+            title="Total Duties"
+            value={totalObligations}
+            icon={<LayoutGrid size={20} />}
+            subtitle="Combined Device & Component Obligations"
           />
           <StatCard
-            title="Highest Risk Tier"
-            value={riskTierLabel}
-            icon={<AlertOctagon size={20} />}
-            subtitle={riskTierSubtitle}
-            type={highestRiskTier === 1 ? 'danger' : highestRiskTier === 2 ? 'warning' : 'success'}
+            title="Operational Gaps"
+            value={warningFailures}
+            icon={<Ghost size={20} />}
+            subtitle="Medium-Risk Compliance Deviations"
+            type={warningFailures > 0 ? 'warning' : 'success'}
           />
         </div>
 

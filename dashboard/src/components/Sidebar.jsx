@@ -35,25 +35,25 @@ export default function Sidebar({
         {isScanning ? 'Scanning Network…' : 'Scan Network'}
       </button>
 
-      {/* ── Network Status ── */}
+      {/* ── Compliance Metrics ── */}
       <div style={{ marginTop: '20px' }}>
         <h4 className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
-          Network Status
+          Compliance Metrics
         </h4>
         <div className="flex justify-between items-center" style={{ marginBottom: '10px' }}>
           <span className="flex items-center gap-2"><Wifi size={15} style={{ color: '#3fb950' }} /> Connection</span>
           <span style={{ color: '#3fb950', fontWeight: 600 }}>Secure</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="flex items-center gap-2"><HardDrive size={15} className="text-primary" /> Discovered</span>
-          <span style={{ fontWeight: 600 }}>{totalFound} Node{totalFound !== 1 ? 's' : ''}</span>
+          <span className="flex items-center gap-2"><HardDrive size={15} className="text-primary" /> Tracked Nodes</span>
+          <span style={{ fontWeight: 600 }}>{totalFound}</span>
         </div>
       </div>
 
-      {/* ── ISO 27001 Classification ── */}
+      {/* ── Strategic Obligations ── */}
       <div style={{ marginTop: '20px', paddingTop: '18px', borderTop: '1px solid var(--glass-border)' }}>
         <h4 className="text-muted" style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px' }}>
-          ISO 27001 Classification
+          Strategic Obligations
         </h4>
 
         {Object.entries(TIER_CONFIG).map(([tier, conf]) => {

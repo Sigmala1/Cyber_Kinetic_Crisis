@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
   Power, PowerOff, Wifi, WifiOff, Lock, Unlock, Users,
-  ShieldAlert, ShieldCheck, Activity, Wrench, Link2,
-  MapPin, Cable, Globe, Layers, Ghost,
+  ShieldAlert, ShieldCheck, Activity, Wrench, Link2, CheckCircle2, XCircle,
+  MapPin, Cable, Globe, Layers, Ghost, AlertCircle, Search
 } from 'lucide-react';
 import { TIER_CONFIG } from '../tiers';
 import SecurityTierBadge from './SecurityTierBadge';
@@ -10,6 +10,7 @@ import ComponentList from './ComponentList';
 
 const TIER_FILTERS = [
   { label: 'All Tiers',          value: null },
+  { label: 'T0 · Critical',      value: 0    },
   { label: 'T1 · Restricted',    value: 1    },
   { label: 'T2 · Confidential',  value: 2    },
   { label: 'T3 · Internal',      value: 3    },
@@ -29,8 +30,6 @@ export default function DeviceGrid({ devices }) {
   const filteredDevices = selectedTiers.length === 0
     ? devices
     : devices.filter(d => selectedTiers.includes(d.securityTier));
-
-  const hasAny = filteredDevices.length > 0;
 
   if (devices.length === 0) return (
     <div className="flex justify-center items-center" style={{ height: '200px', color: 'var(--text-secondary)' }}>
@@ -81,126 +80,98 @@ export default function DeviceGrid({ devices }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(370px, 1fr))', gap: '20px' }}>
         {filteredDevices.map(dev => <DeviceCard key={dev.id} device={dev} />)}
       </div>
-
     </div>
   );
 }
 
-/* ─────────────────────────────────────────── */
-/* Known Device Card                           */
-/* ─────────────────────────────────────────── */
 function DeviceCard({ device }) {
-  const isDanger        = device.cyberState === 'Compromised';
-  const isWarning       = device.cyberState === 'Warning';
-  const tierConf        = TIER_CONFIG[device.securityTier] || TIER_CONFIG[4];
-  const has2FAViolation = tierConf.requires2FA && !device.has2FA;
-  const glowClass       = isDanger ? 'animate-alert' : '';
+  const unmetObligations = device.obligations.filter(o => o.status === 'unmet');
+  const criticalUnmet    = unmetObligations.filter(o => o.criticality === 'high');
+  
+  const isCompliant      = unmetObligations.length === 0;
+  const isCriticallyNonCompliant = criticalUnmet.length > 0;
+  
+  const statusColor = isCriticallyNonCompliant ? 'var(--danger)' : isCompliant ? '#3fb950' : '#ffab70';
+  const statusBg = isCriticallyNonCompliant ? 'rgba(248,81,73,0.1)' : isCompliant ? 'rgba(63,185,80,0.1)' : 'rgba(255,171,112,0.1)';
 
   return (
     <div
-      className={`glass-panel flex-col ${glowClass}`}
+      className={`glass-panel flex-col ${isCriticallyNonCompliant ? 'animate-alert' : ''}`}
       style={{
         padding: 0, overflow: 'hidden',
-        borderColor: isDanger ? 'var(--danger)' : has2FAViolation ? 'rgba(248,81,73,0.5)' : tierConf.border,
+        borderColor: isCriticallyNonCompliant ? 'var(--danger)' : isCompliant ? 'var(--glass-border)' : 'rgba(255,171,112,0.5)',
       }}
     >
-      <div style={{ height: '4px', width: '100%', background: tierConf.color, flexShrink: 0 }} />
+      <div style={{ height: '4px', width: '100%', background: statusColor, flexShrink: 0 }} />
 
-      {has2FAViolation && (
-        <div style={{
-          background: 'rgba(248,81,73,0.1)', borderBottom: '1px solid rgba(248,81,73,0.28)',
-          padding: '6px 20px', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.3px',
-          color: '#ff7b72', display: 'flex', alignItems: 'center', gap: '6px',
-        }}>
-          ⚠ ISO 27001 § 8.5 — 2FA NOT CONFIGURED · Required for {tierConf.label} ({tierConf.shortLabel}) devices
+      <div style={{
+        background: statusBg, borderBottom: '1px solid var(--glass-border)',
+        padding: '10px 20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.5px',
+        color: statusColor, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div className="flex items-center gap-2">
+          {isCompliant ? <ShieldCheck size={14} /> : <AlertCircle size={14} />}
+          {isCompliant ? 'COMPLIANCE FIDELITY: SECURED' : `OBLIGATION BREACH: ${unmetObligations.length} UNMET DUTIES`}
         </div>
-      )}
+        <div style={{ opacity: 0.8, fontSize: '0.65rem' }}>
+          ISO 27001 § {device.securityTier === 0 ? 'ANX A.5' : '8.5'}
+        </div>
+      </div>
 
       <div style={{ padding: '20px' }}>
-        <div className="flex justify-between items-center" style={{ marginBottom: '10px' }}>
+        <div className="flex justify-between items-start" style={{ marginBottom: '16px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', color: isDanger ? 'var(--danger)' : 'var(--text-primary)' }}>
-              {device.name}
-            </h3>
-            <span className="text-muted flex items-center gap-2" style={{ fontSize: '0.78rem', textTransform: 'uppercase', marginTop: '2px' }}>
+            <div className="flex items-center gap-3">
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-primary)' }}>{device.name}</h3>
+              <span className={`badge ${device.cyberState === 'Compromised' ? 'danger' : device.cyberState === 'Warning' ? 'warning' : 'neutral'}`} 
+                    style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px' }}>
+                {device.cyberState} Telemetry
+              </span>
+            </div>
+            <span className="text-muted flex items-center gap-2" style={{ fontSize: '0.78rem', textTransform: 'uppercase', marginTop: '4px' }}>
               <span>{device.type} · {device.id}</span>
               <span className="flex items-center gap-1" style={{ borderLeft: '1px solid var(--glass-border)', paddingLeft: '8px' }}>
                 <Globe size={11} /> {device.ipAddress}
               </span>
             </span>
-            <span className="text-muted flex items-center gap-1" style={{ fontSize: '0.73rem', marginTop: '3px' }}>
-              <MapPin size={11} /> {device.location.building}, {device.location.room} · {device.location.city}, {device.location.state}
-            </span>
           </div>
-          {isDanger
-            ? <ShieldAlert size={22} style={{ color: 'var(--danger)', flexShrink: 0 }} />
-            : <ShieldCheck size={22} style={{ color: '#3fb950',       flexShrink: 0 }} />
-          }
+          <div className="flex flex-col items-end gap-1">
+             <SecurityTierBadge tier={device.securityTier} has2FA={device.has2FA} />
+          </div>
         </div>
 
-        <div style={{ marginBottom: '16px' }}>
-          <SecurityTierBadge tier={device.securityTier} has2FA={device.has2FA} />
+        <div style={{ marginBottom: '20px' }}>
+          <h4 className="text-muted" style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Search size={12} /> Strategic Obligation Checklist
+          </h4>
+          <div className="flex-col gap-2" style={{ background: 'rgba(0,0,0,0.25)', padding: '12px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+            {device.obligations.map(ob => (
+              <div key={ob.id} className="flex justify-between items-center" style={{ fontSize: '0.82rem' }}>
+                <div className="flex items-center gap-3">
+                  {ob.status === 'met' 
+                    ? <CheckCircle2 size={15} style={{ color: '#3fb950' }} /> 
+                    : <XCircle size={15} style={{ color: ob.criticality === 'high' ? 'var(--danger)' : '#ffab70' }} />
+                  }
+                  <div className="flex-col">
+                    <span style={{ fontWeight: 500, color: ob.status === 'met' ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{ob.label}</span>
+                    <span style={{ fontSize: '0.68rem', opacity: 0.6 }} className="text-muted">{ob.description}</span>
+                  </div>
+                </div>
+                <span className={`badge ${ob.status === 'met' ? 'success' : ob.criticality === 'high' ? 'danger' : 'warning'}`} 
+                      style={{ fontSize: '0.6rem', padding: '1px 6px', opacity: ob.status === 'met' ? 0.7 : 1 }}>
+                  {ob.status.toUpperCase()}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-          <StatusBadge icon={device.isOn ? <Power size={13}/> : <PowerOff size={13}/>}
-                       label={device.isOn ? 'Power: On' : 'Power: Off'} type={device.isOn ? 'success' : 'neutral'} />
-          <StatusBadge icon={device.isOnline ? <Wifi size={13}/> : <WifiOff size={13}/>}
-                       label={device.isOnline ? 'Online' : 'Offline'} type={device.isOnline ? 'success' : 'danger'} />
-          <StatusBadge icon={device.hasPassword ? <Lock size={13}/> : <Unlock size={13}/>}
-                       label={device.hasPassword ? 'Secured' : 'Open Access'} type={device.hasPassword ? 'success' : 'warning'} />
-          <StatusBadge icon={<Activity size={13}/>} label={device.condition}
-                       type={device.condition === 'Optimal' ? 'success' : device.condition === 'Degraded' ? 'warning' : 'danger'} />
-        </div>
-
-        <div className="flex-col gap-2" style={{ fontSize: '0.83rem', padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
-          <div className="flex justify-between">
-            <span className="text-muted flex items-center gap-2"><Layers size={13} /> System Class:</span>
-            <span style={{ fontWeight: 500, color: 'var(--primary)' }}>{device.systemCategory}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted flex items-center gap-2"><Wrench size={13} /> Last Maintained:</span>
-            <span>{device.lastMaintainedDate}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted flex items-center gap-2"><Users size={13} /> Allowed Roles:</span>
-            <span>{device.authorizedRoles.join(', ')}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted flex items-center gap-2"><Users size={13} /> Active Users:</span>
-            <span style={{ fontWeight: 600, color: device.activeUsers > 0 ? 'var(--primary)' : 'var(--text-primary)' }}>
-              {device.activeUsers}
-            </span>
-          </div>
-          <div className="flex flex-col" style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--glass-border)' }}>
-            <span className="text-muted flex items-center gap-2" style={{ marginBottom: '6px' }}><Link2 size={13} /> Dependencies:</span>
-            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-              {device.dependencies.length
-                ? device.dependencies.map(dep => <span key={dep} className="badge neutral" style={{ fontSize: '0.68rem' }}>{dep}</span>)
-                : <span className="text-muted">None</span>}
-            </div>
-          </div>
-          <div className="flex flex-col" style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--glass-border)' }}>
-            <span className="text-muted flex items-center gap-2" style={{ marginBottom: '6px' }}><Cable size={13} /> Open Ports:</span>
-            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-              {device.openPorts?.length
-                ? device.openPorts.map(port => <span key={port} className="badge warning" style={{ fontSize: '0.68rem' }}>{port}</span>)
-                : <span className="text-muted">None</span>}
-            </div>
-          </div>
+        <div className="flex items-center gap-3 text-muted" style={{ fontSize: '0.73rem', marginBottom: '16px', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
+           <MapPin size={13} /> <span>{device.location.building}, {device.location.room} · {device.location.city}, {device.location.state}</span>
         </div>
 
         <ComponentList components={device.components} />
       </div>
-    </div>
-  );
-}
-
-
-function StatusBadge({ icon, label, type }) {
-  return (
-    <div className={`badge ${type}`} style={{ justifyContent: 'center', padding: '6px 8px' }}>
-      {icon} {label}
     </div>
   );
 }

@@ -3,6 +3,15 @@
  * Security tier configuration shared across all dashboard components.
  */
 export const TIER_CONFIG = {
+  0: {
+    label: 'Critical Infrastructure',
+    shortLabel: 'T0',
+    color: '#ffffff',
+    bg: 'rgba(255, 255, 255, 0.12)',
+    border: 'rgba(255, 255, 255, 0.4)',
+    requires2FA: true,
+    description: 'Vital assets — failure or compromise causes catastrophic facility-wide impact',
+  },
   1: {
     label: 'Restricted',
     shortLabel: 'T1',
