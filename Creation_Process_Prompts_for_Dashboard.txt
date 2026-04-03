@@ -543,23 +543,385 @@ Please review the
 Implementation Plan
  and let me know if you approve or if you have any adjustments to the "Obligation" types or the dashboard terminology. Once you're satisfied, I'll begin the implementation.
 
+Obligation-Centric Design: Requirement & Compliance System
+This plan describes how to transform the dashboard from a basic status monitor into an Obligation-Centric platform. Every node and sub-component will have a set of "Obligations" (e.g., 2FA, maintenance, connectivity) that are dynamically generated and evaluated.
 
-*
+User Review Required
+IMPORTANT
+
+Terminology Shift: We will transition from using terms like "Threats" and "Violations" to "Unmet Obligations" and "Compliance Fidelity."
+Dynamic Evaluation: Obligations will be calculated on-the-fly based on security tiers and device types, ensuring that every device has specific duties to fulfill.
+Proposed Changes
+Core Logic & Configuration
+[MODIFY] 
+tiers.js
+Refine the TIER_CONFIG to include an obligations template for each tier (e.g., Tier 1 requires 2FA, Optimal status, and High Encryption).
+[MODIFY] 
+App.jsx
+Introduce generateObligations(entity): A core engine that assigns a list of tasks/requirements to any device or component.
+Example: [{ id: 'auth', label: '2FA Enabled', status: 'met' }, { id: 'health', label: 'Optimal Condition', status: 'unmet' }]
+Modify MOCK_DEVICES usage: Ensure every device and nested component is mapped through this engine.
+New Stats:
+Total Obligations: cumulative count of all requirements across the fleet.
+Fulfillment Rate: Percentage of obligations marked as "met".
+Critical Duties: Count of unmet obligations in Tier 1 and 2.
+UI Components
+[MODIFY] 
+StatCard.jsx
+No logic changes, but we will pass new metrics like "Obligation Fulfillment" (percentage).
+[MODIFY] 
+DeviceGrid.jsx
+DeviceCard Refactor:
+Replace the simple "Status" badges with an Obligation Checklist.
+Add a visual indicator for "Obligation Health" using a progress bar or tally.
+Components will also display their specific obligations (e.g., "Firmware: Must be Vers 3.0+").
+[MODIFY] 
+Sidebar.jsx
+Update standard labels to "Compliance Overview."
+Reframing "Discovered Nodes" as "Tracked Obligations."
+Open Questions
+IMPORTANT
+
+Should we include "Maintenance Window" as a temporal obligation (e.g., "Must be maintained every 6 months")?
+What should be the visual priority: The device status (Normal/Warning) or the Obligation status (Met/Unmet)?
+Verification Plan
+Automated Tests
+Verify that generateObligations correctly identifies "unmet" status when device properties (like has2FA) are false for high-tier devices.
+Check that total obligation counts match the expected sum of requirements across all devices.
+Manual Verification
+Start the dashboard and verify that every device card now shows a list of "Obligations."
+Confirm that clicking "Initiate Audit" (formerly scan) triggers the correct evaluation of these duties.
+
+
+
+
+*I would like to adjust the plan to not have a "Maintenance Window" as a temporal obligation. Additionally, the visual priority should be Obligation status over device status.
+-> I have updated the 
+Implementation Plan
+ and 
+Task List
+ based on your feedback.
+
+Key Adjustments:
+No Temporal Obligations: Maintenance windows and last-maintained dates will not be treated as obligations.
+Visual Priority Shift: The UI will now prioritize Obligation status (Met/Unmet) as the primary visual indicator. Technical health (Normal/Warning/Compromised) will be demoted to a secondary detail.
+Card Redesign: Device cards will focus on a central Obligation Checklist, with the card's color-coding and status badge reflecting overall compliance fidelity rather than just technical state.
+Please review the updated 
+Implementation Plan
+ and let me know if you approve. One remaining question: Should I completely hide the "Cyber State" (e.g., Warning/Danger) to focus entirely on obligations, or keep it as a small secondary detail?
+
+Obligation-Centric Design: Requirement & Compliance System
+This plan describes how to transform the dashboard from a basic status monitor into an Obligation-Centric platform. Every node and sub-component will have a set of "Obligations" (e.g., 2FA, maintenance, connectivity) that are dynamically generated and evaluated.
+
+User Review Required
+IMPORTANT
+
+Terminology Shift: We will transition from using terms like "Threats" and "Violations" to "Unmet Obligations" and "Compliance Fidelity."
+Dynamic Evaluation: Obligations will be calculated on-the-fly based on security tiers and device types, ensuring that every device has specific duties to fulfill.
+Proposed Changes
+Core Logic & Configuration
+[MODIFY] 
+tiers.js
+Refine the TIER_CONFIG to include an obligations template for each tier (e.g., Tier 1 requires 2FA, Optimal status, and High Encryption).
+[MODIFY] 
+App.jsx
+Introduce generateObligations(entity): A core engine that assigns a list of tasks/requirements to any device or component.
+Example: [{ id: 'auth', label: '2FA Enabled', status: 'met' }, { id: 'health', label: 'Optimal Condition', status: 'unmet' }]
+Modify MOCK_DEVICES usage: Ensure every device and nested component is mapped through this engine.
+New Stats:
+Total Obligations: cumulative count of all requirements across the fleet.
+Fulfillment Rate: Percentage of obligations marked as "met".
+Critical Duties: Count of unmet obligations in Tier 1 and 2.
+UI Components
+[MODIFY] 
+StatCard.jsx
+No logic changes, but we will pass new metrics like "Obligation Fulfillment" (percentage).
+[MODIFY] 
+DeviceGrid.jsx
+DeviceCard Refactor:
+Visual Priority: Shift primary focus from "Cyber State" (e.g., Warning/Danger) to Obligation Compliance.
+The card's main color coding and status badge will reflect whether all obligations are met.
+Add a detailed Obligation Checklist as the central element of the card.
+Components will also display their specific obligations (e.g., "Firmware: Must be Vers 3.0+").
+[MODIFY] 
+Sidebar.jsx
+Update standard labels to "Compliance Overview."
+Reframing "Security Tier" as "Obligation Tier."
+Update descriptions to emphasize the "duty of compliance" for each level.
+Open Questions
+IMPORTANT
+
+Should we completely hide the "Cyber State" (Normal/Warning) to fully enforce the obligation-centric view, or keep it as a secondary detail?
+Does the shift to "Obligation Tier" sufficiently communicate the increased responsibility for high-tier devices?
+Verification Plan
+Automated Tests
+Verify that generateObligations correctly identifies "unmet" status when device properties (like has2FA) are false for high-tier devices.
+Check that total obligation counts match the expected sum of requirements across all devices.
+Manual Verification
+Start the dashboard and verify that every device card now shows a list of "Obligations."
+Confirm that clicking "Initiate Audit" (formerly scan) triggers the correct evaluation of these duties.
+
+
+*I would like to change the plan so that the "Obligation Tier" doesn't exist, and that the "Cyber State" is kept as a secondary detail.
+-> I have updated the 
+Implementation Plan
+ and 
+Task List
+ once more to align with your latest feedback.
+
+Key Adjustments:
+No "Obligation Tier": I have reverted to the original "Security Tier" (ISO 27001) terminology for information classification.
+Cyber State as Secondary: The "Cyber State" (Normal/Warning/Compromised) will be kept as a secondary, smaller detail in the UI rather than being hidden or prioritized.
+Obligation Priority: The primary visual status of the device cards and the overall dashboard will still be driven by Obligation Compliance (Met/Unmet).
+Please review the latest plan and let me know if it meets your requirements. Once approved, I will begin the implementation. Note: No maintenance-based obligations will be included.
+
+Obligation-Centric Design: Requirement & Compliance System
+This plan describes how to transform the dashboard from a basic status monitor into an Obligation-Centric platform. Every node and sub-component will have a set of "Obligations" (e.g., 2FA, maintenance, connectivity) that are dynamically generated and evaluated.
+
+User Review Required
+IMPORTANT
+
+Terminology Shift: We will transition from using terms like "Threats" and "Violations" to "Unmet Obligations" and "Compliance Fidelity."
+Dynamic Evaluation: Obligations will be calculated on-the-fly based on security tiers and device types, ensuring that every device has specific duties to fulfill.
+Proposed Changes
+Core Logic & Configuration
+[MODIFY] 
+tiers.js
+Refine the TIER_CONFIG to include an obligations template for each tier (e.g., Tier 1 requires 2FA, Optimal status, and High Encryption).
+[MODIFY] 
+App.jsx
+Introduce generateObligations(entity): A core engine that assigns a list of tasks/requirements to any device or component.
+Example: [{ id: 'auth', label: '2FA Enabled', status: 'met' }, { id: 'health', label: 'Optimal Condition', status: 'unmet' }]
+Modify MOCK_DEVICES usage: Ensure every device and nested component is mapped through this engine.
+New Stats:
+Total Obligations: cumulative count of all requirements across the fleet.
+Fulfillment Rate: Percentage of obligations marked as "met".
+Critical Duties: Count of unmet obligations in Tier 1 and 2.
+UI Components
+[MODIFY] 
+StatCard.jsx
+No logic changes, but we will pass new metrics like "Obligation Fulfillment" (percentage).
+[MODIFY] 
+DeviceGrid.jsx
+DeviceCard Refactor:
+Visual Priority: Shift primary focus to Obligation Compliance. The card's main color coding and status badge will reflect whether all obligations are met.
+Secondary Cyber State: The "Cyber State" (Normal/Warning/Compromised) will be kept as a secondary visual detail (e.g., a small badge or icon).
+Add a detailed Obligation Checklist as the central element of the card.
+Components will also display their specific obligations.
+[MODIFY] 
+Sidebar.jsx
+Update standard labels to "Compliance Overview."
+Keep Security Tier: We will retain the existing "Security Tier" (ISO 27001) terminology instead of renaming it to "Obligation Tier."
+No Temporal Obligations: Maintenance windows and last-maintained dates will not be treated as obligations.
+Open Questions
+IMPORTANT
+
+Are there any specific "Critical Obligations" (beyond 2FA) that should immediately turn the card red/danger regardless of other met obligations?
+Should we define a hierarchy for "Cyber State" vs "Obligation Status" to ensure the most critical alert is always prioritized?
+Verification Plan
+Automated Tests
+Verify that generateObligations correctly identifies "unmet" status when device properties (like has2FA) are false for high-tier devices.
+Check that total obligation counts match the expected sum of requirements across all devices.
+Manual Verification
+Start the dashboard and verify that every device card now shows a list of "Obligations."
+Confirm that clicking "Initiate Audit" (formerly scan) triggers the correct evaluation of these duties.
+
+
+*I would like to make changes so that if something doesn't have 2FA and exists in security tiers 0, 1, or 2, it should be flagged. We do not need a hieracrhy for "Cyber State" vs "Obligation Status" to ensure the most critical alert is always prioritized.
+-> I have updated the 
+Implementation Plan
+ and 
+Task List
+ with your latest requirements.
+
+Key Refinements:
+Tier 0 Introduction: I will add "Tier 0: Critical Infrastructure" as the highest security level in the system configuration.
+Mandatory 2FA: I have added a strict rule to the obligation engine: if a device resides in Security Tiers 0, 1, or 2 and does not have 2FA enabled, it will be flagged with a high-priority "Unmet Obligation."
+Simplified Status Priority: I have removed the complex hierarchy between "Cyber State" and "Obligation Status." Both will be evaluated and displayed independently, ensuring that the most critical information is visible without complicated suppression logic.
+Please review the updated 
+Implementation Plan
+. Once you approve, I will begin the implementation starting with the Tier 0 configuration and the obligation engine.
+
+Obligation-Centric Design: Requirement & Compliance System
+This plan describes how to transform the dashboard from a basic status monitor into an Obligation-Centric platform. Every node and sub-component will have a set of "Obligations" (e.g., 2FA, maintenance, connectivity) that are dynamically generated and evaluated.
+
+User Review Required
+IMPORTANT
+
+Terminology Shift: We will transition from using terms like "Threats" and "Violations" to "Unmet Obligations" and "Compliance Fidelity."
+Dynamic Evaluation: Obligations will be calculated on-the-fly based on security tiers and device types, ensuring that every device has specific duties to fulfill.
+Proposed Changes
+Core Logic & Configuration
+[MODIFY] 
+tiers.js
+Refine the TIER_CONFIG to include an obligations template for each tier (e.g., Tier 1 requires 2FA, Optimal status, and High Encryption).
+[MODIFY] 
+App.jsx
+Introduce generateObligations(entity): A core engine that assigns a list of tasks/requirements to any device or component.
+Example: [{ id: 'auth', label: '2FA Enabled', status: 'met' }, { id: 'health', label: 'Optimal Condition', status: 'unmet' }]
+Modify MOCK_DEVICES usage: Ensure every device and nested component is mapped through this engine.
+New Stats:
+Total Obligations: cumulative count of all requirements across the fleet.
+Fulfillment Rate: Percentage of obligations marked as "met".
+Critical Duties: Count of unmet obligations in Tier 1 and 2.
+UI Components
+[MODIFY] 
+StatCard.jsx
+No logic changes, but we will pass new metrics like "Obligation Fulfillment" (percentage).
+[MODIFY] 
+DeviceGrid.jsx
+DeviceCard Refactor:
+Visual Priority: Shift primary focus to Obligation Compliance. The card's main color coding and status badge will reflect whether all obligations are met.
+Secondary Cyber State: The "Cyber State" (Normal/Warning/Compromised) will be kept as a secondary visual detail (e.g., a small badge or icon).
+Add a detailed Obligation Checklist as the central element of the card.
+Components will also display their specific obligations.
+[MODIFY] 
+Sidebar.jsx
+Update standard labels to "Compliance Overview."
+Keep Security Tier: We will retain the existing "Security Tier" (ISO 27001) terminology.
+New Tier 0: Introduce "Tier 0: Critical Infrastructure" as the highest sensitivity level.
+2FA Requirement: Tiers 0, 1, and 2 will have a mandatory "2FA Enabled" obligation. Any node in these tiers without 2FA will be flagged with a high-priority "Unmet Obligation."
+No Status Hierarchy: Both "Obligation Status" and "Cyber State" will be evaluated independently. The most critical overall status will be determined by whether any critical obligation is unmet or the cyber state is "Compromised."
+Open Questions
+IMPORTANT
+
+Should we treat components (sub-parts) with the same 2FA requirement as their parent device, or do components follow their own specific tier rules?
+Verification Plan
+Automated Tests
+Verify that generateObligations correctly identifies "unmet" status when device properties (like has2FA) are false for high-tier devices.
+Check that total obligation counts match the expected sum of requirements across all devices.
+Manual Verification
+Start the dashboard and verify that every device card now shows a list of "Obligations."
+Confirm that clicking "Initiate Audit" (formerly scan) triggers the correct evaluation of these duties.
+
+
+*I would like to add changes that ignore treating components with the same 2FA requirement as their parent device. Components don't follow their own specific tier rules.
+-> I have updated the 
+Implementation Plan
+ and 
+Task List
+ to incorporate your latest requirements regarding components.
+
+Final Plan Adjustments:
+Device-Only 2FA: The requirement for 2FA in Tiers 0, 1, and 2 will apply only to parent devices.
+Component Exemption: Sub-parts and components will not inherit 2FA requirements and will not follow tier-specific rules. Their obligations will be focused strictly on basic operational health (e.g., condition and status).
+Consolidated Hierarchy: I have removed the complex priority hierarchy for status alerts as requested; all critical items (unmet obligations and cyber states) will be visible independently.
+Please let me know if this plan is now complete and ready for execution. Once you approve, I will begin the implementation.
+
+
+
+
+
+*I would like to alter the plan so that there are no other "Status" attributes for components (other than condition and cyberState) that should be tracked as obligations.
 -> 
 
+*I would like to make changes so that the live-status approach for obligations is sufficient.
+->I have finalized the 
+Implementation Plan
+ and 
+Task List
+ for the Obligation-Centric Design.
+
+Summary of the Finalized Plan:
+Live-Status Calibration: Obligations will be evaluated in real-time based on the current telemetry of devices and components. No historical tracking or "last evaluated" timestamps are needed.
+Strict Component Scope: Obligations for nested components are strictly limited to condition and cyberState. They will not be evaluated for 2FA, power, or connectivity.
+Device-Only 2FA: The requirement for 2FA in Tiers 0, 1, and 2 applies only to parent devices.
+Visual Priority: The central focus of the dashboard will be Obligation Compliance. The technical Cyber State will remain as a secondary visual detail.
+Tier 0 Introduction: I will add "Tier 0: Critical Infrastructure" as the highest security level, while retaining the standard Security Tier terminology.
+The plan is now fully aligned with your vision. Please let me know if I have your approval to begin the implementation. Once approved, I'll start by updating the tier configuration and building the obligation evaluation engine.
+
+Obligation-Centric Design: Requirement & Compliance System
+This plan describes how to transform the dashboard from a basic status monitor into an Obligation-Centric platform. Every node and sub-component will have a set of "Obligations" (e.g., 2FA, maintenance, connectivity) that are dynamically generated and evaluated.
+
+User Review Required
+IMPORTANT
+
+Terminology Shift: We will transition from using terms like "Threats" and "Violations" to "Unmet Obligations" and "Compliance Fidelity."
+Dynamic Evaluation: Obligations will be calculated on-the-fly based on security tiers and device types, ensuring that every device has specific duties to fulfill.
+Proposed Changes
+Core Logic & Configuration
+[MODIFY] 
+tiers.js
+Live-Status Architecture: Obligations will be evaluated based on the current live state of the devices; no historical tracking or "last evaluated" timestamps are required.
+Keep Security Tier: We will retain the existing "Security Tier" (ISO 27001) terminology.
+[MODIFY] 
+App.jsx
+Introduce generateObligations(entity): A core engine that assigns a list of tasks/requirements to any device or component.
+Example: [{ id: 'auth', label: '2FA Enabled', status: 'met' }, { id: 'health', label: 'Optimal Condition', status: 'unmet' }]
+Modify MOCK_DEVICES usage: Ensure every device and nested component is mapped through this engine.
+New Stats:
+Total Obligations: cumulative count of all requirements across the fleet.
+Fulfillment Rate: Percentage of obligations marked as "met".
+Critical Duties: Count of unmet obligations in Tier 1 and 2.
+UI Components
+[MODIFY] 
+StatCard.jsx
+No logic changes, but we will pass new metrics like "Obligation Fulfillment" (percentage).
+[MODIFY] 
+DeviceGrid.jsx
+DeviceCard Refactor:
+Visual Priority: Shift primary focus to Obligation Compliance. The card's main color coding and status badge will reflect whether all obligations are met.
+Secondary Cyber State: The "Cyber State" (Normal/Warning/Compromised) will be kept as a secondary visual detail (e.g., a small badge or icon).
+Add a detailed Obligation Checklist as the central element of the card.
+Components will also display their specific obligations.
+[MODIFY] 
+Sidebar.jsx
+Update standard labels to "Compliance Overview."
+Keep Security Tier: We will retain the existing "Security Tier" (ISO 27001) terminology.
+New Tier 0: Introduce "Tier 0: Critical Infrastructure" as the highest sensitivity level.
+Device-Only 2FA: The "2FA Enabled" obligation applies only to parent devices in Tiers 0, 1, and 2.
+Component Strict Scope: Components (sub-parts) will have their obligations strictly limited to condition and cyberState. No other attributes (including 2FA, power status, or connectivity) will be tracked as obligations for components.
+Verification Plan
+Automated Tests
+Verify that generateObligations correctly identifies "unmet" status when device properties (like has2FA) are false for high-tier devices.
+Check that total obligation counts match the expected sum of requirements across all devices.
+Manual Verification
+Start the dashboard and verify that every device card now shows a list of "Obligations."
+Confirm that clicking "Initiate Audit" (formerly scan) triggers the correct evaluation of these duties.
 
 
 
 
+*Proceed
+->I have successfully transformed the Cyber-Kinetic Crisis dashboard into a Strategic Obligation Audit platform. The system now shifts focus from reactive threat detection to proactive duty fulfillment and compliance tracking.
 
+Key Features Implemented:
+Dynamic Obligation Engine: A new core logic in App.jsx that assigns specific responsibilities (MFA, connectivity, health, etc.) to every device and component based on its status and security tier.
+Compliance-First UI:
+Device Cards: Now feature a prominent Strategic Obligation Checklist, where the card's primary color and status reflect overall "Compliance Fidelity."
+Strategic Metrics: New dashboard stats track Fulfillment Rate (%), Scope of Obligation, and Critical Failures (high-risk unmet duties).
+Tier 0: Critical Infrastructure: Introduced a new, highest-sensitivity level to the ISO 27001 configuration to handle vital assets with mandatory 2FA.
+Component Accountability: Sub-parts are now audited strictly for their individual Health and Telemetry obligations, ensuring granular visibility without inheriting parent-tier security rules.
+Status Prioritization: Technical "Cyber State" (Normal/Warning/Compromised) is retained as a secondary detail while Compliance Duty takes primary visual precedence.
+Modified Files:
 
+tiers.js
+: Tier 0 addition and refined classification.
 
+App.jsx
+: Implementation of the obligation evaluation engine and top-level compliance UI.
 
+DeviceGrid.jsx
+: Redesigned cards with the obligation checklist.
 
+Sidebar.jsx
+: Updated labeling for compliance metrics.
 
+ComponentList.jsx
+: Audit view for component accountability.
+For a full summary of the changes and logic verification, please refer to the 
+Walkthrough
+.
 
+*Please apply these changes to the github repository.
+-> I have successfully applied all the changes to the GitHub repository at https://github.com/Sigmala1/Cyber_Kinetic_Crisis.git.
 
-
+Summary of Actions:
+Git Push: The new obligation-centric monitoring features, including the dynamic compliance engine, Tier 0 support, and the redesigned UI components, are now merged into the main branch.
+Rebase & Sync: I performed a rebase with the remote repository to ensure a clean history before successfully pushing the updates.
+You can now view the latest version of the "Strategic Obligation Audit" platform directly in your repository. For a detailed breakdown of the technical changes, see the 
+Walkthrough
+.
 
 
 
