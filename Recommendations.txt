@@ -34,3 +34,18 @@ How it's organized: planned, unplanned, deferred, shutdown
 How it's prioritized: reliability-centered, risk-based
 
 In facilities and critical assets, the main buckets people usually use are preventative, predictive, corrective, reactive, and emergency. 
+
+
+
+Focus on splitting into two things: take a look at network scanning and network discovery for IoT for onboarding.
+
+Don’t put network discovery into cyber dashboard; network discovery will be a side project for onboarding, open source
+
+Cyber dashboard must be obligation centric – create obligations, then expose them
+
+Antigravity can mess up your network stack
+	
+Use Targon to as a server that isn’t your machine to not mess with your network stack.
+
+Google Antigravity can integrate to Targon via SSH
+
