@@ -17,6 +17,10 @@ echo -n "john.doe@bluewave.com" | gcloud secrets versions add BLUEWAVE_USER --da
 
 gcloud secrets create BLUEWAVE_PASS --replication-policy="automatic"
 echo -n "Criticalasset@2026" | gcloud secrets versions add BLUEWAVE_PASS --data-file=-
+
+# Optional: Set the production origin for CORS
+gcloud secrets create FRONTEND_URL --replication-policy="automatic"
+echo -n "https://cyber-dashboard-[HASH].a.run.app" | gcloud secrets versions add FRONTEND_URL --data-file=-
 ```
 
 ## 2. Porting the Backend (Cloud Run)
@@ -31,6 +35,7 @@ gcloud run deploy cyber-api \
   --image gcr.io/[PROJECT_ID]/cyber-api \
   --platform managed \
   --region us-central1 \
+  --set-env-vars="COMPANY_API_USER=projects/[PROJECT_NUMBER]/secrets/BLUEWAVE_USER/versions/latest,COMPANY_API_PASS=projects/[PROJECT_NUMBER]/secrets/BLUEWAVE_PASS/versions/latest,FAST_CORS_ORIGIN=*" \
   --allow-unauthenticated
 ```
 
@@ -46,6 +51,7 @@ gcloud run deploy cyber-dashboard \
   --image gcr.io/[PROJECT_ID]/cyber-dashboard \
   --platform managed \
   --region us-central1 \
+  --set-env-vars="VITE_API_URL=https://cyber-api-[HASH].a.run.app" \
   --allow-unauthenticated
 ```
 

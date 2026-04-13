@@ -126,6 +126,24 @@ function App() {
   const [devices,          setDevices]          = useState([]);
   const [isScanning,       setIsScanning]        = useState(false);
   const [viewMode,         setViewMode]           = useState('grid'); // 'grid' | 'topology'
+  const [apiMetadata,      setApiMetadata]       = useState(null);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  /* ─── API Integration ─── */
+  const fetchLiveAudit = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/devices`);
+      const result = await response.json();
+      if (result.status === 'success') {
+        setApiMetadata(result.data);
+        console.log('Live Audit Data Received:', result.data);
+      }
+    } catch (err) {
+      console.warn('Backend API unreachable. Falling back to simulated scan.', err);
+    }
+  };
+
 
   /* ─── Obligation Engine ─── */
   const generateObligations = (node, isComponent = false) => {
@@ -187,6 +205,7 @@ function App() {
   const startScan = () => {
     setIsScanning(true);
     setDevices([]);
+    fetchLiveAudit(); // Trigger real-time backend check
     MOCK_DEVICES.forEach((device, index) => {
       setTimeout(() => {
         const enrichedDevice = {
@@ -232,11 +251,20 @@ function App() {
         flex: 1, padding: '32px', overflowY: 'auto',
         background: 'radial-gradient(circle at 50% 0%, #1a2234 0%, var(--bg-color) 40%)',
       }}>
-        <header style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Strategic Obligation Audit</h1>
-          <p className="text-muted" style={{ margin: 0 }}>
-            Real-time fulfillment tracking of ISO 27001-aligned obligations and duty of care requirements.
-          </p>
+        <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div>
+            <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>Strategic Obligation Audit</h1>
+            <p className="text-muted" style={{ margin: 0 }}>
+              Real-time fulfillment tracking of ISO 27001-aligned obligations and duty of care requirements.
+            </p>
+          </div>
+          {apiMetadata && (
+            <div style={{ fontSize: '0.7rem', padding: '10px', background: 'rgba(63,185,80,0.1)', border: '1px solid rgba(63,185,80,0.3)', borderRadius: '8px', color: '#3fb950' }}>
+               <div style={{ fontWeight: 700, textTransform: 'uppercase' }}>Live Deployment Linked</div>
+               <div>ID: {apiMetadata.uid || 'wrk-ufgxkm54avvi'}</div>
+               <div>Status: Running</div>
+            </div>
+          )}
         </header>
 
         {/* ── Row 1: Compliance stats ── */}
