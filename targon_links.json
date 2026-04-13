@@ -1,0 +1,14 @@
+[
+  {
+    "text": "Sign Up",
+    "href": "https://targon.com/sign-up"
+  },
+  {
+    "text": "Continue with Google",
+    "href": "https://targon.com/sign-in/google"
+  },
+  {
+    "text": "Forgot Password?",
+    "href": "https://targon.com/send-reset-password"
+  }
+]
