@@ -1,0 +1,22 @@
+{
+  "rental_id": "wrk-ufgxkm54avvi",
+  "name": "cyber-kinetic-crisis",
+  "status": "Running",
+  "ssh_command": "ssh wrk-ufgxkm54avvi@ssh.deployments.targon.com",
+  "created_at": "2026-04-02T09:25:00",
+  "cost_per_hour": 0.09,
+  "resources": {
+    "vcpus": 4,
+    "ram_gb": 50,
+    "gpus": 0
+  },
+  "container": {
+    "image": "ghcr.io/manifold-inc/ubuntu-systemd-docker:v3",
+    "commands": "N/A",
+    "args": "None"
+  },
+  "network": {
+    "active_ports": []
+  },
+  "volumes": []
+}
