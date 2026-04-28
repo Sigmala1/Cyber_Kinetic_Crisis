@@ -86,5 +86,5 @@ Review the Scopes tab to ensure assets.read is enabled (as shown in your API sco
 The Client ID shown there (ca_6af07aa10b5e2f63652eeb24c850b169) is exactly what we have already configured in your codebase (company_api_mcp.py / proxy_api.js) to authenticate requests.
 Once those settings are saved in the developer console, your Cyber Dashboard will be fully integrated and authorized to pull telemetry natively from the API!
 
-
+* The requisite changes have been made. Please try to run the Cyber Dashboard directly from the CriticalAsset API.
 -> 
