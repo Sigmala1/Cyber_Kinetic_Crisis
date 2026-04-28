@@ -21,4 +21,7 @@ Topology Rendering: This new Cloud Instance is automatically prepended to the ar
 The dashboard will now securely retrieve the live data flowing from company_api_mcp.py and visibly map the connected asset into your environment scan! Let me know if you would like me to start the local development server to test it.
 
 * I would like you to start the local development server to test it.
+-> The google antigravity window crashed and needed to be reloaded
+
+* I need the cyber dashboard to function within the CriticalAsset API in addition to the web browser. If unable to operate within the web browser, create word document explaining how to properly integrate within the platform.
 -> 
