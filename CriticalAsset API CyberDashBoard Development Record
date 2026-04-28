@@ -87,4 +87,27 @@ The Client ID shown there (ca_6af07aa10b5e2f63652eeb24c850b169) is exactly what 
 Once those settings are saved in the developer console, your Cyber Dashboard will be fully integrated and authorized to pull telemetry natively from the API!
 
 * The requisite changes have been made. Please try to run the Cyber Dashboard directly from the CriticalAsset API.
+-> I attempted to run the Cyber Dashboard directly against the CriticalAsset API, but the browser blocked the request due to a CORS (Cross-Origin Resource Sharing) policy violation.
+
+Specifically, the browser's console reported:
+
+Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+This means that when the dashboard (running on http://localhost:5173) attempted to reach out directly to https://company-stg.criticalasset.com, the API rejected it because it didn't recognize localhost as an allowed origin.
+
+Since you mentioned making the requisite changes in the Developer Console, here are a few reasons why this might still be failing:
+
+Propagation Delay: Sometimes changes saved in Developer Consoles take a few minutes to propagate across the API gateways.
+Exact URL Matching: Ensure the CORS tab has exactly http://localhost:5173 (with no trailing slash / at the end).
+API Limitations: Some enterprise APIs strictly prohibit browser-based calls (enforcing server-to-server communication only) regardless of the CORS UI settings.
+Next Steps
+If the CORS settings are exactly correct and it still fails after a few minutes, we must revert the dashboard to communicate through our Python Backend (company_api_mcp.py).
+
+Because backend servers do not enforce browser CORS policies, the Python backend can securely fetch the data from CriticalAsset and pass it to your React dashboard seamlessly.
+
+Would you like me to wait a moment and try the direct browser connection again, or should I reconfigure the dashboard to route through our Python backend?
+
+* 
 -> 
+
+
