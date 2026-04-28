@@ -60,5 +60,15 @@ Obligation Engine: The core logic that evaluates Condition, Cyber State, MFA Enf
 You can review the full summary in the Walkthrough artifact. The platform is fully integrated! Let me know if you need anything else.
 
 
+* How do we open up the cyber dashboard within the Critical Asset API: https://company-stg.criticalasset.com/developer-console/applications/786ca001-1c14-4d32-9918-1d02252f0939
+-> As we discovered during the browser testing, navigating to that specific Developer Console URL using your credentials currently redirects to the main dashboard. This typically happens when the developer features are locked or that specific App ID isn't fully provisioned for your account yet, preventing me from automating the embedding process directly in the browser.
+
+Following your instructions, since I am unable to operate within that part of the web browser, I have created a Word Document explaining exactly how to properly open and integrate the cyber dashboard within the platform once access is restored.
+
+You can find the document here: /home/aaron/Cyber_Kinetic_Crisis/Cyber_Dashboard_Integration_Guide.doc
+
+It contains step-by-step instructions on deploying the React application to GCP and securely embedding the resulting URL as a UI widget or iFrame inside the CriticalAsset Developer Console. Let me know if you need any adjustments to the guide!
+
+
 * 
 -> 
