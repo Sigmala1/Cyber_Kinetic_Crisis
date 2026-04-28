@@ -71,4 +71,20 @@ It contains step-by-step instructions on deploying the React application to GCP 
 
 
 * I was unable to locate any of the "UI Extensions", "Embedded Apps", or "Web Integrations" tabs within the application settings. 
+-> Thank you for providing the screenshot! That clears up the confusion perfectly.
+
+Based on the Application Details page you are looking at, the CriticalAsset Developer Console is specifically designed for Backend API and OAuth integrations rather than serving as an "app store" for visual UI widgets. Because it's an API integration console, it doesn't actually have tabs for "Embedded Apps" or "UI Extensions."
+
+Instead, to "open up" the connection so your dashboard functions with the API, you must configure the network security to allow your independently hosted React app to communicate with CriticalAsset.
+
+I have updated the Cyber_Dashboard_Integration_Guide.doc to accurately reflect this process based on the tabs shown in your screenshot.
+
+To complete the integration, you will need to:
+
+Click on the CORS tab in that console and add your dashboard's URL (e.g., http://localhost:5173 for your local server, or your Cloud Run URL).
+Review the Scopes tab to ensure assets.read is enabled (as shown in your API scopes list).
+The Client ID shown there (ca_6af07aa10b5e2f63652eeb24c850b169) is exactly what we have already configured in your codebase (company_api_mcp.py / proxy_api.js) to authenticate requests.
+Once those settings are saved in the developer console, your Cyber Dashboard will be fully integrated and authorized to pull telemetry natively from the API!
+
+
 -> 
