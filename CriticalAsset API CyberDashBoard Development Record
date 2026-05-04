@@ -107,7 +107,38 @@ Because backend servers do not enforce browser CORS policies, the Python backend
 
 Would you like me to wait a moment and try the direct browser connection again, or should I reconfigure the dashboard to route through our Python backend?
 
+* Please provide assistance with developing and deploying an CI/CD for two-person antigravity team in the devstation1-gcp VM.
+-> I've gone ahead and generated the CI/CD pipeline using GitHub Actions. I separated the pipeline into two distinct workflows (one for the backend API and one for the frontend Dashboard) so they can build and deploy independently depending on which files are modified.
+
+You can find the newly created workflow files in .github/workflows/deploy-api.yml and .github/workflows/deploy-dashboard.yml.
+
+I've also created a Walkthrough Artifact that details the final step: adding the necessary secrets to your GitHub repository to allow GitHub Actions to securely authenticate with GCP and perform the deployments.
+
+Please review the Walkthrough and the .github workflow files. Once you configure the secrets in your GitHub repository and push these changes to your main branch, the automated CI/CD pipeline will be fully active! Let me know if you run into any issues.
+
+
 * 
 -> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
