@@ -117,6 +117,16 @@ I've also created a Walkthrough Artifact that details the final step: adding the
 Please review the Walkthrough and the .github workflow files. Once you configure the secrets in your GitHub repository and push these changes to your main branch, the automated CI/CD pipeline will be fully active! Let me know if you run into any issues.
 
 
+* Please push all changes to the github repository.
+-> I have successfully pushed all your local changes (including the new GitHub Action workflows) to your GitHub repository!
+
+Since the .github/workflows files have now been pushed to the main branch, the CI/CD pipeline is active on the repository. As long as the GCP secrets are configured as outlined in the Walkthrough, your code will now automatically deploy to Cloud Run!
+
+
+* 
+-> 
+
+
 * 
 -> 
 
