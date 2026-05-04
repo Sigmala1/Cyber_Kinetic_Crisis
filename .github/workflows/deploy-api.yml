@@ -1,0 +1,49 @@
+name: Deploy API to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'company_api_mcp.py'
+      - 'Dockerfile.api'
+      - '.github/workflows/deploy-api.yml'
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
+  REGION: us-central1
+  SERVICE: cyber-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          # Assuming you are using a Service Account JSON Key stored in GitHub Secrets.
+          # If using Workload Identity Federation, replace `credentials_json` with:
+          # workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+          # service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and Push Docker Image
+        run: |
+          gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }} . --dockerfile Dockerfile.api
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --set-env-vars="COMPANY_API_USER=projects/${{ env.PROJECT_NUMBER }}/secrets/BLUEWAVE_USER/versions/latest,COMPANY_API_PASS=projects/${{ env.PROJECT_NUMBER }}/secrets/BLUEWAVE_PASS/versions/latest,FAST_CORS_ORIGIN=*" \
+            --allow-unauthenticated
