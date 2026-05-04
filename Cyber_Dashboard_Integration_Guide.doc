@@ -1,0 +1,28 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><title>Cyber Dashboard Integration Guide</title></head>
+<body>
+<h1>Cyber Dashboard Integration Guide</h1>
+<p>Based on the Application Details in the Developer Console, the CriticalAsset platform is designed for backend API and OAuth integrations rather than visual UI embedding (iFrames). To properly integrate your Cyber Dashboard so it functions with the CriticalAsset API, you must configure the application's network and security settings.</p>
+<h2>1. Configure CORS (Cross-Origin Resource Sharing)</h2>
+<p>Because your React dashboard will be hosted on a separate domain (or localhost during development), you must explicitly allow it to communicate with the CriticalAsset API.</p>
+<ol>
+<li>In the Developer Console, navigate to the <b>CORS</b> tab.</li>
+<li>Add your dashboard's deployment URL (e.g., <code>https://cyber-dashboard-[HASH].a.run.app</code>) or your local development URL (<code>http://localhost:5173</code>).</li>
+<li>Save the CORS configuration.</li>
+</ol>
+<h2>2. Verify API Scopes</h2>
+<p>Your dashboard requires specific permissions to read and audit assets.</p>
+<ol>
+<li>Click on the <b>Scopes</b> tab or click <b>Edit</b> next to the API scopes section.</li>
+<li>Ensure that at least the <code>assets.read</code> scope is enabled so the dashboard can fetch the infrastructure topology.</li>
+</ol>
+<h2>3. Client Authentication</h2>
+<p>The Developer Console provides a <b>Client ID</b> (e.g., <code>ca_6af07aa...</code>). This ID is used to authenticate your dashboard's backend (the Python MCP server or Node proxy) with CriticalAsset.</p>
+<ul>
+<li>Your codebase has already been configured to inject this Client ID into the <code>X-Application-Client-Id</code> headers of all outgoing requests.</li>
+<li>If you need elevated permissions in the future, you can use the <b>Regenerate client secret</b> button to enable secure server-to-server OAuth flows.</li>
+</ul>
+<h2>4. Result</h2>
+<p>Once the CORS origins and Scopes are set, your independently hosted Cyber Dashboard will be fully authorized to pull live telemetry and infrastructure data natively from the CriticalAsset API environment.</p>
+</body>
+</html>

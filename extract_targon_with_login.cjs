@@ -15,8 +15,8 @@ async function extractTargonData() {
 
     try {
         console.log('Attempting login...');
-        await page.fill('input[type="email"]', 'john.doe@bluewave.com');
-        await page.fill('input[type="password"]', 'Criticalasset@2026');
+        await page.fill('input[type="email"]', 'aaron@insuremep.com');
+        await page.fill('input[type="password"]', 'Insuremep@2026');
         await page.click('button[type="submit"]'); // Adjust selector as needed
 
         console.log('Waiting for navigation after login...');

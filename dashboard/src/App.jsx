@@ -133,15 +133,22 @@ function App() {
   /* ─── API Integration ─── */
   const fetchLiveAudit = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/devices`);
-      const result = await response.json();
-      if (result.status === 'success') {
-        setApiMetadata(result.data);
-        console.log('Live Audit Data Received:', result.data);
+      const response = await fetch(`https://company-stg.criticalasset.com/rentals/wrk-ufgxkm54avvi`, {
+        headers: {
+          'X-Application-Client-Id': 'ca_6af07aa10b5e2f63652eeb24c850b169',
+          'Authorization': 'Basic ' + btoa('aaron@insuremep.com:Insuremep@2026')
+        }
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setApiMetadata(result);
+        console.log('Live Audit Data Received:', result);
+        return result;
       }
     } catch (err) {
       console.warn('Backend API unreachable. Falling back to simulated scan.', err);
     }
+    return null;
   };
 
 
@@ -202,11 +209,44 @@ function App() {
   };
 
   /* Normal network scan — enriched with obligations */
-  const startScan = () => {
+  const startScan = async () => {
     setIsScanning(true);
     setDevices([]);
-    fetchLiveAudit(); // Trigger real-time backend check
-    MOCK_DEVICES.forEach((device, index) => {
+    
+    // Trigger real-time backend check
+    const liveData = await fetchLiveAudit();
+    
+    let allDevices = [...MOCK_DEVICES];
+    
+    if (liveData) {
+      const liveDevice = {
+        id: liveData.rental_id || 'CA-CLOUD-01',
+        name: liveData.name || 'CriticalAsset Environment',
+        type: 'Cloud Instance',
+        securityTier: 1,
+        has2FA: true,
+        isOn: liveData.status === 'Running',
+        isOnline: liveData.status === 'Running',
+        hasPassword: true,
+        condition: 'Optimal',
+        cyberState: 'Normal',
+        lastMaintainedDate: liveData.created_at ? liveData.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+        authorizedRoles: ['Admin'],
+        activeUsers: 1,
+        dependencies: ['NET-GW-01'],
+        location: { city: 'Cloud', state: 'Virtual', country: 'Global', building: 'Data Center', room: 'Instance Node' },
+        openPorts: liveData.network?.active_ports || [22, 443],
+        ipAddress: liveData.ssh_command ? liveData.ssh_command.split('@')[1] : 'Dynamic IP',
+        systemCategory: 'Compute',
+        components: [
+          { name: `vCPUs: ${liveData.resources?.vcpus || 'N/A'}`, securityTier: 1, has2FA: false, cyberState: 'Normal' },
+          { name: `RAM: ${liveData.resources?.ram_gb || 'N/A'} GB`, securityTier: 1, has2FA: false, cyberState: 'Normal' },
+        ],
+      };
+      allDevices = [liveDevice, ...allDevices];
+    }
+
+    allDevices.forEach((device, index) => {
       setTimeout(() => {
         const enrichedDevice = {
           ...device,
@@ -217,7 +257,7 @@ function App() {
           }))
         };
         setDevices(prev => [...prev, enrichedDevice]);
-        if (index === MOCK_DEVICES.length - 1) setIsScanning(false);
+        if (index === allDevices.length - 1) setIsScanning(false);
       }, 800 * (index + 1));
     });
   };

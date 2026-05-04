@@ -13,10 +13,10 @@ Before deploying, store the sensitive credentials discovered in the Targon envir
 ```bash
 # Create secrets for API access
 gcloud secrets create BLUEWAVE_USER --replication-policy="automatic"
-echo -n "john.doe@bluewave.com" | gcloud secrets versions add BLUEWAVE_USER --data-file=-
+echo -n "aaron@insuremep.com" | gcloud secrets versions add BLUEWAVE_USER --data-file=-
 
 gcloud secrets create BLUEWAVE_PASS --replication-policy="automatic"
-echo -n "Criticalasset@2026" | gcloud secrets versions add BLUEWAVE_PASS --data-file=-
+echo -n "Insuremep@2026" | gcloud secrets versions add BLUEWAVE_PASS --data-file=-
 
 # Optional: Set the production origin for CORS
 gcloud secrets create FRONTEND_URL --replication-policy="automatic"

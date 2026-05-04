@@ -18,8 +18,8 @@ async function extractTargonData() {
 
     try {
         console.log('Filling login credentials...');
-        await page.fill('#email', 'john.doe@bluewave.com');
-        await page.fill('#password', 'Criticalasset@2026');
+        await page.fill('#email', 'aaron@insuremep.com');
+        await page.fill('#password', 'Insuremep@2026');
         
         console.log('Clicking login button...');
         // Looking for the "Log In" button by text since I don't see a clear ID in the previous grep
