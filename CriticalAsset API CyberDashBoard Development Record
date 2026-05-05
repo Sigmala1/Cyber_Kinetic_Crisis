@@ -124,11 +124,29 @@ Since the .github/workflows files have now been pushed to the main branch, the C
 
 
 * Please assist with the configuration of the GCP secrets as outlined in the Walkthrough.
+-> Error message
+
+
+* Please show the walkthrough for the CI/CD pipeline.
+-> I have pulled the CI/CD pipeline walkthrough from our previous conversation and created an artifact for you to review:
+
+CI/CD Pipeline Walkthrough
+
+As a reminder, to fully activate the pipeline, you will need to add the following secrets to your GitHub Repository (Settings > Secrets and variables > Actions):
+
+GCP_PROJECT_ID
+GCP_PROJECT_NUMBER
+GCP_CREDENTIALS
+VITE_API_URL
+Let me know if you'd like to dive into any specific part of the setup or if there's anything else you'd like to work on!
+
+
+* Commit the two .github/workflows to the repository.
 -> 
 
 
 * 
--> 
+->
 
 
 
