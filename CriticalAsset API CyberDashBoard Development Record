@@ -142,7 +142,15 @@ Let me know if you'd like to dive into any specific part of the setup or if ther
 
 
 * Commit the two .github/workflows to the repository.
--> 
+-> I checked the git history and it looks like I actually already committed and pushed those two .github/workflows files to the repository at the end of our last session!
+
+I just ran a git pull to ensure your local environment is perfectly synced with the remote repository.
+
+Since the files are already in your main branch, you can skip step 1 in the walkthrough. The next steps are simply:
+
+Ensure the required repository secrets (GCP_PROJECT_ID, GCP_PROJECT_NUMBER, GCP_CREDENTIALS, VITE_API_URL) are configured in your GitHub Repository under Settings > Secrets and variables > Actions.
+Any new changes you push to main from now on will automatically trigger those deployments!
+If you'd like to make a test commit to watch the CI/CD pipeline run in action, or if there's another feature you want to work on next, just let me know!
 
 
 * 
